@@ -78,6 +78,12 @@ export const getAllUsers = () => {
 export const getUser = userId => {
 	return getDocument(userRef(userId))
 }
+export const getUserByName = userName => {
+	console.log(userName)
+	return getDocuments(
+		query(usersRef, where('username', '==', userName))
+	)
+}
 
 export const addUser = data => {
 	return addDocument(usersRef, data)
@@ -268,6 +274,7 @@ export const listenMessages = (
 }
 
 const formatQueryDataObject = queryData => {
+	if (queryData == null) { return null }
 	return { ...queryData.data(), id: queryData.id }
 }
 

@@ -71,26 +71,26 @@ export default {
 			showChat: true,
 			users: [
 				{
-					_id: '6R0MijpK6M4AIrwaaCY2',
-					username: 'Luke',
+					_id: 'jctm4gV6GUPrhU0AyaYj',
+					username: 'huong',
 					avatar: 'https://66.media.tumblr.com/avatar_c6a8eae4303e_512.pnj'
 				},
 				{
-					_id: 'SGmFnBZB4xxMv9V4CVlW',
-					username: 'Leia',
+					_id: 'Tm3QRWz1EmZjDWQRir8b',
+					username: 'nvduy',
 					avatar: 'https://avatarfiles.alphacoders.com/184/thumb-184913.jpg'
 				},
 				{
-					_id: '6jMsIXUrBHBj7o2cRlau',
-					username: 'Yoda',
+					_id: 'no2LE3XEGwpn8GKkixgA',
+					username: 'Leia',
 					avatar:
 						'https://vignette.wikia.nocookie.net/teamavatarone/images/4/45/Yoda.jpg/revision/latest?cb=20130224160049'
 				}
 			],
-			currentUserId: '6R0MijpK6M4AIrwaaCY2',
+			currentUserId: 'AH3fXvFOapHdrU6c8dCi',
 			isDevice: false,
-			showDemoOptions: true,
-			updatingData: false
+			showDemoOptions: true
+			// updatingData: false
 		}
 	},
 
@@ -115,66 +115,66 @@ export default {
 	},
 
 	methods: {
-		resetData() {
-			firestoreService.getAllRooms().then(({ data }) => {
-				data.forEach(async room => {
-					await firestoreService.getMessages(room.id).then(({ data }) => {
-						data.forEach(message => {
-							firestoreService.deleteMessage(room.id, message.id)
-							if (message.files) {
-								message.files.forEach(file => {
-									storageService.deleteFile(
-										this.currentUserId,
-										message.id,
-										file
-									)
-								})
-							}
-						})
-					})
+		// resetData() {
+		// 	firestoreService.getAllRooms().then(({ data }) => {
+		// 		data.forEach(async room => {
+		// 			await firestoreService.getMessages(room.id).then(({ data }) => {
+		// 				data.forEach(message => {
+		// 					firestoreService.deleteMessage(room.id, message.id)
+		// 					if (message.files) {
+		// 						message.files.forEach(file => {
+		// 							storageService.deleteFile(
+		// 								this.currentUserId,
+		// 								message.id,
+		// 								file
+		// 							)
+		// 						})
+		// 					}
+		// 				})
+		// 			})
 
-					firestoreService.deleteRoom(room.id)
-				})
-			})
+		// 			firestoreService.deleteRoom(room.id)
+		// 		})
+		// 	})
 
-			firestoreService.getAllUsers().then(({ data }) => {
-				data.forEach(user => {
-					firestoreService.deleteUser(user.id)
-				})
-			})
-		},
-		async addData() {
-			this.updatingData = true
+		// 	firestoreService.getAllUsers().then(({ data }) => {
+		// 		data.forEach(user => {
+		// 			firestoreService.deleteUser(user.id)
+		// 		})
+		// 	})
+		// },
+		// async addData() {
+		// 	this.updatingData = true
 
-			const user1 = this.users[0]
-			await firestoreService.addIdentifiedUser(user1._id, user1)
+		// 	const user1 = this.users[0]
+		// 	await firestoreService.addIdentifiedUser(user1._id, user1)
 
-			const user2 = this.users[1]
-			await firestoreService.addIdentifiedUser(user2._id, user2)
+		// 	const user2 = this.users[1]
+		// 	await firestoreService.addIdentifiedUser(user2._id, user2)
 
-			const user3 = this.users[2]
-			await firestoreService.addIdentifiedUser(user3._id, user3)
+		// 	const user3 = this.users[2]
+		// 	await firestoreService.addIdentifiedUser(user3._id, user3)
 
-			await firestoreService.addRoom({
-				users: [user1._id, user2._id],
-				lastUpdated: new Date()
-			})
-			await firestoreService.addRoom({
-				users: [user1._id, user3._id],
-				lastUpdated: new Date()
-			})
-			await firestoreService.addRoom({
-				users: [user2._id, user3._id],
-				lastUpdated: new Date()
-			})
-			await firestoreService.addRoom({
-				users: [user1._id, user2._id, user3._id],
-				lastUpdated: new Date()
-			})
+		// 	await firestoreService.addRoom({
+		// 		users: [user1._id, user2._id],
+		// 		lastUpdated: new Date()
+		// 	})
+		// 	await firestoreService.addRoom({
+		// 		users: [user1._id, user3._id],
+		// 		lastUpdated: new Date()
+		// 	})
+		// 	await firestoreService.addRoom({
+		// 		users: [user2._id, user3._id],
+		// 		lastUpdated: new Date()
+		// 	})
+		// 	await firestoreService.addRoom({
+		// 		users: [user1._id, user2._id, user3._id],
+		// 		lastUpdated: new Date()
+		// 	})
 
-			this.updatingData = false
-			location.reload()
-		}
+		// 	this.updatingData = false
+		// 	location.reload()
+		// }
 	}
 }
 </script>

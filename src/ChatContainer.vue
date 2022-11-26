@@ -782,15 +782,29 @@ export default {
 		async createRoom() {
 			this.disableForm = true
 
-			const { id } = await firestoreService.addUser({
-				username: this.addRoomUsername
-			})
-			await firestoreService.updateUser(id, { _id: id })
+			const users = await firestoreService.getUserByName(this.addRoomUsername)
+			if (users.data.length !== 0) {
+				await firestoreService.addRoom({
+					users: [users.data[0].id, this.currentUserId],
+					lastUpdated: new Date()
+				})
+				// await firestoreService.addRoomUser(this.inviteRoomId, )
+			} else {
+				const { id } = await firestoreService.addUser({
+					username: this.addRoomUsername
+				})
+				await firestoreService.updateUser(id, { _id: id })
 
-			await firestoreService.addRoom({
-				users: [id, this.currentUserId],
-				lastUpdated: new Date()
-			})
+				await firestoreService.addRoom({
+					users: [id, this.currentUserId],
+					lastUpdated: new Date()
+				})
+				// await firestoreService.addRoomUser(this.inviteRoomId, id)
+			}
+			// const { id } = await firestoreService.addUser({
+			// 	username: this.addRoomUsername
+			// })
+			// await firestoreService.updateUser(id, { _id: id })
 
 			this.addNewRoom = false
 			this.addRoomUsername = ''
@@ -805,12 +819,17 @@ export default {
 		async addRoomUser() {
 			this.disableForm = true
 
-			const { id } = await firestoreService.addUser({
-				username: this.invitedUsername
-			})
-			await firestoreService.updateUser(id, { _id: id })
+			const users = await firestoreService.getUserByName(this.invitedUsername)
+			if (users.data.length !== 0) {
+				await firestoreService.addRoomUser(this.inviteRoomId, users.data[0].id)
+			} else {
+				const { id } = await firestoreService.addUser({
+					username: this.invitedUsername
+				})
+				await firestoreService.updateUser(id, { _id: id })
 
-			await firestoreService.addRoomUser(this.inviteRoomId, id)
+				await firestoreService.addRoomUser(this.inviteRoomId, id)
+			}
 
 			this.inviteRoomId = null
 			this.invitedUsername = ''
