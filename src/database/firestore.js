@@ -84,6 +84,12 @@ export const getUserByName = userName => {
 		query(usersRef, where('username', '==', userName))
 	)
 }
+export const getUserByUid = uId => {
+	console.log(uId)
+	return getDocuments(
+		query(usersRef, where('uid', '==', uId))
+	)
+}
 
 export const addUser = data => {
 	return addDocument(usersRef, data)

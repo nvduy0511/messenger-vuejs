@@ -17,8 +17,11 @@
 	},
 	"dependencies": {
 		"firebase": "^9.14.0",
+		"firebaseui": "^6.0.2",
 		"vue": "3.2.37",
-		"vue-advanced-chat": "latest"
+		"vue-advanced-chat": "latest",
+		"vue-router": "^4.1.6",
+		"vuetify": "^3.0.1"
 	},
 	"devDependencies": {
 		"@babel/core": "7.12.16",
