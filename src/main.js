@@ -17,13 +17,20 @@ const vuetify = createVuetify({
 })
 
 const routes = [
-    { path: '/', component: Home },
+    { path: '/', component: Home ,meta: { requiresAuth: true }},
     { path: '/login', component: Login },
 ];
 export const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+router.beforeEach(async (to, from, next) => {
+    const user  = JSON.parse(localStorage.getItem('user'))
+    if (user == null && to.meta.requiresAuth) {
+      next('/login');
+    } 
+    else next();
+  });
 const app = createApp(App);
 app.use(router);
 app.use(vuetify);

@@ -65,6 +65,7 @@ export default {
 
 	data() {
 		const user  = JSON.parse(localStorage.getItem('user'))
+			
 		return {
 			theme: 'light',
 			showChat: true,
@@ -88,7 +89,8 @@ export default {
 			],
 			currentUserId: user.id,
 			isDevice: false,
-			showDemoOptions: true
+			showDemoOptions: true,
+			isShowDialog:false
 			// updatingData: false
 		}
 	},
@@ -107,6 +109,10 @@ export default {
 	},
 
 	mounted() {
+		const user  = JSON.parse(localStorage.getItem('user'))
+		if(user == null){
+			this.$route.push({ path: '/login' })
+		}	
 		this.isDevice = window.innerWidth < 500
 		window.addEventListener('resize', ev => {
 			if (ev.isTrusted) this.isDevice = window.innerWidth < 500

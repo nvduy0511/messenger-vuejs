@@ -1,12 +1,6 @@
 <template>
 	<div class="window-container" :class="{ 'window-mobile': isDevice }">
-		<form v-if="addNewRoom" @submit.prevent="createRoom">
-			<input v-model="addRoomUsername" type="text" placeholder="Add username" />
-			<button type="submit" :disabled="disableForm || !addRoomUsername">
-				Create Room
-			</button>
-			<button class="button-cancel" @click="addNewRoom = false">Cancel</button>
-		</form>
+		
 
 		<form v-if="inviteRoomId" @submit.prevent="addRoomUser">
 			<input v-model="invitedUsername" type="text" placeholder="Add username" />
@@ -71,6 +65,35 @@
 				New message container
 			</div> -->
 		</vue-advanced-chat>
+		<v-dialog
+			v-model="addNewRoom"
+			width="500"
+		>
+			<v-card>
+				<v-card-title class="text-h5 grey lighten-2">
+				Privacy Policy
+				</v-card-title>
+
+				<form v-if="addNewRoom" @submit.prevent="createRoom">
+					<input v-model="addRoomUsername" type="text" placeholder="Add username" />
+					<button type="submit" :disabled="disableForm || !addRoomUsername">
+						Create Room
+					</button>
+					<button class="button-cancel" @click="addNewRoom = false">Cancel</button>
+				</form>
+
+				<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn
+					color="primary"
+					text
+					@click="addNewRoom = false"
+				>
+					I accept
+				</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 	</div>
 </template>
 
@@ -79,7 +102,6 @@ import * as firestoreService from '@/database/firestore'
 import * as firebaseService from '@/database/firebase'
 import * as storageService from '@/database/storage'
 import { parseTimestamp, formatTimestamp } from '@/utils/dates'
-import logoAvatar from '@/assets/logo.png'
 
 import { register } from 'vue-advanced-chat'
 // import { register } from './../../dist/vue-advanced-chat.es.js'
@@ -272,7 +294,7 @@ export default {
 				const roomAvatar =
 					roomContacts.length === 1 && roomContacts[0].avatar
 						? roomContacts[0].avatar
-						: logoAvatar
+						: 'https://firebasestorage.googleapis.com/v0/b/messenger-vuejs-8793f.appspot.com/o/my_file%2Fgroup.png?alt=media&token=57742754-7356-4bee-9acf-cc9854782a43'
 
 				formattedRooms.push({
 					...room,
