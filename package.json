@@ -21,6 +21,7 @@
 		"vue": "3.2.37",
 		"vue-advanced-chat": "latest",
 		"vue-router": "^4.1.6",
+		"vue-tippy": "^6.0.0-alpha.30",
 		"vuetify": "^3.0.1"
 	},
 	"devDependencies": {

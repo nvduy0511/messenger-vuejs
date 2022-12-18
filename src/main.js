@@ -1,9 +1,11 @@
-import { createApp } from 'vue';
+import { createApp } from 'vue'
 
-import App from './App.vue';
-import Login from './Login.vue';
-import Home from './Home.vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import App from './App.vue'
+import Login from './Login.vue'
+import Home from './Home.vue'
+import NewFeedPage from './NewfeedPage.vue'
+import UserInfo from './UserInfo.vue';
+import { createRouter, createWebHistory } from 'vue-router'
 
 // Vuetify
 import 'vuetify/styles'
@@ -12,26 +14,28 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 
 const vuetify = createVuetify({
-    components,
-    directives,
+	components,
+	directives
 })
 
 const routes = [
-    { path: '/', component: Home ,meta: { requiresAuth: true }},
-    { path: '/login', component: Login },
-];
+	{ path: '/', component: NewFeedPage,},
+	{ path: '/account', component: UserInfo,},
+
+	// { path: '/', component: Home, meta: { requiresAuth: true } },
+	{ path: '/login', component: Login }
+]
 export const router = createRouter({
-    history: createWebHistory(),
-    routes,
-});
+	history: createWebHistory(),
+	routes
+})
 router.beforeEach(async (to, from, next) => {
-    const user  = JSON.parse(localStorage.getItem('user'))
-    if (user == null && to.meta.requiresAuth) {
-      next('/login');
-    } 
-    else next();
-  });
-const app = createApp(App);
-app.use(router);
-app.use(vuetify);
-app.mount('#app');
+	const user = JSON.parse(localStorage.getItem('user'))
+	if (user == null && to.meta.requiresAuth) {
+		next('/login')
+	} else next()
+})
+const app = createApp(App)
+app.use(router)
+app.use(vuetify)
+app.mount('#app')
