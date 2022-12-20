@@ -1,6 +1,6 @@
 <template>
 
-    <Header></Header>
+    <Header :posts="this.posts"></Header>
     <main>
         <div class="container">
             <div class="col-9">
@@ -141,7 +141,7 @@
                             <p class="message">
                                 <b>{{ post.author }}</b>
                             </p>
-                            <p class="message" >{{ post.title }}</p>
+                            <p class="message">{{ post.title }}</p>
 
                         </a>
                         <a style="cursor: pointer;" v-on:click="handleWatchAllComment(post.id)">
@@ -209,7 +209,7 @@ import DetailPost from './components/NewFeedPost/DetailPost.vue';
 import Header from './components/Header/Header.vue';
 // import ListLike from './ListLike.vue';
 import { firestoreDb } from './database/index';
-import { collection, getDocs, doc, deleteDoc, addDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, addDoc, setDoc } from "firebase/firestore";
 
 
 
@@ -238,9 +238,14 @@ export default ({
             let data = [];
             const querySnapshot = await getDocs(collection(firestoreDb, "posts"));
             querySnapshot.forEach((doc) => {
+                // console.log(doc.data().dateCreate)
                 return data.push({ ...doc.data(), id: doc.id });
             });
             // console.log(data);
+            data.sort((a, b) => {
+                // console.log(a.dateCreate.toString())
+                return new Date(a.dateCreate).getTime() < new Date(b.dateCreate).getTime() ? 1 : -1;
+            })
             this.posts = data;
         }
 
@@ -263,21 +268,13 @@ export default ({
 
     },
     methods: {
-        handleLikePost(postId) {
+        async handleLikePost(postId) {
             const arr = this.likes.filter(i => { return i.idPost.trim().toString() === postId });
             if (arr.length !== 0) {
                 console.log("unlike")
 
                 let idToRemove = "";
                 let postObject = {};
-                this.likes.map(i => {
-                    if (i.idPost.trim().toString() === postId) {
-                        // i.likes = i.likes - 1;
-                        idToRemove = i.id;
-                        return;
-                    }
-                })
-
 
                 this.posts.map(i => {
                     if (i.id === postId) {
@@ -286,37 +283,43 @@ export default ({
                     }
                 })
 
-                // console.log(idToRemove)
-                const deleteLike = async () => {
-                    await deleteDoc(doc(firestoreDb, "like", idToRemove));
-                }
+                await setDoc(doc(firestoreDb, "posts", postId), postObject);
+                
+                this.likes.map(i => {
+                    if (i.idPost.trim().toString() === postId) {
+                        // i.likes = i.likes - 1;
+                        idToRemove = i.id;
+                        return;
+                    }
+                })
 
-                deleteLike();
+                await deleteDoc(doc(firestoreDb, "like", idToRemove));
+
                 return this.likes = this.likes.filter(i => { return i.idPost.trim().toString() !== postId })
             } else {
                 console.log("like");
                 const fetchData = async () => {
 
-                    // let object = {};
+                    let object = {};
 
                     this.posts.map(i => {
                         if (i.id === postId) {
                             i.likes = +i.likes + 1;
-                            // return object = i;
+                            return object = i;
                         }
                     })
+
+                    await setDoc(doc(firestoreDb, "posts", postId), object);
+
                     const docRef = await addDoc(collection(firestoreDb, "like"), {
                         idPost: postId,
-                        uid: "loiphan123",
-                        name: 'loiphan_lp',
-                        userName: 'Lợi Phan',
-                        avatar: 'https://scontent.fsgn5-9.fna.fbcdn.net/v/t1.6435-9/94788962_1735590786592292_2879927579450540032_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=yeNuCcYYZXoAX9DaJTi&tn=ClkyF_n1-sJve_dM&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfBkQhqaHfwigciH3tGU1NYt3PrP4v01GUK5a3bBnnX7dQ&oe=63ABD1C6'
+                        id: JSON.parse(localStorage.getItem('user')).id,
+                        name: JSON.parse(localStorage.getItem('user')).username,
+                        userName: JSON.parse(localStorage.getItem('user')).username,
+                        avatar: JSON.parse(localStorage.getItem('user')).avatar
                     })
-
-
-                    // console.log({ id: docRef.id, idPost: postId, uid: "loiphan123" })
                     this.likes.push(
-                        { id: docRef.id, idPost: postId, uid: "loiphan123" }
+                        { id: docRef.id, idPost: postId, uid: JSON.parse(localStorage.getItem('user')).id }
                     )
                 }
 
@@ -324,7 +327,7 @@ export default ({
             }
         },
         handleLikePostStatus(postId) {
-            const checkLike = this.likes.filter((i) => { return i.idPost.trim().toString() === postId })
+            const checkLike = this.likes.filter((i) => { return i.idPost === postId })
             if (checkLike.length === 0) {
                 return false;
             } else {
@@ -333,7 +336,7 @@ export default ({
         },
         handleWatchAllComment(postId) {
             // console.log(postId)
-            this.posts.map(i => { if (i.id.trim().toString() === postId) { return this.openPost = i } return });
+            this.posts.map(i => { if (i.id === postId) { return this.openPost = i } return });
             // return post;
             // const originalStyle = window.getComputedStyle(document.body).overflow;
 
@@ -349,8 +352,8 @@ export default ({
                     const docRef = await addDoc(collection(firestoreDb, "comments"), {
                         body: this.message,
                         dateComment: dateComment,
-                        name: "loiphan",
-                        avatar: "https://scontent.fsgn5-9.fna.fbcdn.net/v/t1.6435-9/94788962_1735590786592292_2879927579450540032_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=yeNuCcYYZXoAX9DaJTi&tn=ClkyF_n1-sJve_dM&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfBkQhqaHfwigciH3tGU1NYt3PrP4v01GUK5a3bBnnX7dQ&oe=63ABD1C6",
+                        name: JSON.parse(localStorage.getItem('user')).username,
+                        avatar: JSON.parse(localStorage.getItem('user')).avatar,
                         postId: id,
                         dateComment: dateComment.toUTCString(),
                     })
@@ -709,7 +712,7 @@ main .container {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .col-9 .card .top .userDetails h3 {
@@ -738,6 +741,7 @@ main .container {
     width: 100%;
     min-height: 600px;
     margin: 10px 0 15px;
+    background-color: black;
 }
 
 .actionBtns {

@@ -53,7 +53,7 @@
                             </svg>
                         </li>
 
-                        <li>
+                        <li v-on:click="this.createNewPost = true" >
                             <svg aria-label="New post" class="_ab6-" color="#262626" fill="#262626" height="24"
                                 role="img" viewBox="0 0 24 24" width="24">
                                 <path
@@ -71,7 +71,7 @@
                                 <div class="profilepic">
                                     <div class="profile_img">
                                         <div class="image">
-                                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093229/g-200x200.png"
+                                            <img :src="getAvatar"
                                                 alt="img8">
                                         </div>
                                     </div>
@@ -84,12 +84,18 @@
         </nav>
     </header>
 
+    <!-- Hiện thị khung tạo bài viết mới -->
+    <Backdrop v-if="this.createNewPost" @open="createNewPost = !createNewPost" />
+    <CreateNewPost v-if="this.createNewPost" :posts="this.posts" :method="closeCreatePost"/>
+
 </template>
 
 <script>
 
 // import axios from 'axios';
 import SearchRes from './SearchRes.vue';
+import Backdrop from '../../components/Backdrop.vue';
+import CreateNewPost from '../CreateNewPost/CreateNewPost.vue';
 import { directive, Tippy } from 'vue-tippy';
 import { firestoreDb } from '../../database/index';
 import { collection, getDocs, doc, deleteDoc, addDoc } from "firebase/firestore";
@@ -105,15 +111,19 @@ function createDebounce() {
 }
 
 export default ({
+    props: ['posts'],
     name: 'Header',
     data: () => ({
         listSearch: [],
         searchText: '',
+        createNewPost: false,
         debounce: createDebounce(),
     }),
     components: {
         SearchRes,
         Tippy,
+        CreateNewPost,
+        Backdrop,
     },
     directives: {
         tippy: directive,
@@ -134,6 +144,14 @@ export default ({
             }
             fetchData();
             this.searchText = value;
+        },
+        closeCreatePost(){
+            this.createNewPost = !this.createNewPost;
+        }
+    },
+    computed: {
+        getAvatar(){
+            return JSON.parse(localStorage.getItem('user')).avatar;
         }
     }
 })
