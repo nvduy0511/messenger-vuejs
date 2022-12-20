@@ -1,14 +1,16 @@
 <template>
     <div :key="dataPost.id" class="detailPost">
-        <img :src="dataPost.image" />
-        <div>
+        <div class="imageCover" >
+            <img :src="dataPost.image" class="cover" />
+        </div>
+        <div class="infoPost" >
             <!-- <h1>{{data}}</h1> -->
             <div class="top">
                 <div class="userDetails">
                     <div class="profilepic">
                         <div class="profile_img">
                             <div class="image">
-                                <img :src="dataPost.avatar" alt="img8">
+                                <img :src="dataPost.avatar"  alt="img8">
                             </div>
                         </div>
                     </div>
@@ -171,35 +173,24 @@ export default {
         getAllCommentForPost();
 
     },
-    unmounted() {
-        // window.location.reload(true);
-    },
     methods: {
         handleSubmitComment(id) {
             if (this.message !== '') {
                 const dateComment = new Date();
                 const handleComment = async () => {
 
-                    const docRef = await addDoc(collection(fireStore, "comments"), {
+                    const object = {
                         body: this.message,
                         dateComment: dateComment,
-                        name: "loiphan",
-                        avatar: "https://scontent.fsgn5-9.fna.fbcdn.net/v/t1.6435-9/94788962_1735590786592292_2879927579450540032_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=yeNuCcYYZXoAX9DaJTi&tn=ClkyF_n1-sJve_dM&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfBkQhqaHfwigciH3tGU1NYt3PrP4v01GUK5a3bBnnX7dQ&oe=63ABD1C6",
+                        name: JSON.parse(localStorage.getItem('user')).username,
+                        avatar: JSON.parse(localStorage.getItem('user')).avatar,
                         postId: id,
                         dateComment: dateComment.toUTCString(),
-                    })
+                    }
 
-                    this.comments.push(
-                        {
-                            id: docRef.id,
-                            body: this.message,
-                            dateComment: dateComment,
-                            name: "loiphan",
-                            avatar: "https://scontent.fsgn5-9.fna.fbcdn.net/v/t1.6435-9/94788962_1735590786592292_2879927579450540032_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=yeNuCcYYZXoAX9DaJTi&tn=ClkyF_n1-sJve_dM&_nc_ht=scontent.fsgn5-9.fna&oh=00_AfBkQhqaHfwigciH3tGU1NYt3PrP4v01GUK5a3bBnnX7dQ&oe=63ABD1C6",
-                            postId: id,
-                            dateComment: dateComment.toUTCString(),
-                        }
-                    )
+                    const docRef = await addDoc(collection(firestoreDb, "comments"), object)
+
+                    this.comments.push(object)
                     this.message = '';
                 }
 
@@ -233,23 +224,26 @@ export default {
     transform: translate(-50%, -50%);
     width: 70vw;
     height: 92vh;
-    /* overflow-y: scroll; */
-    display: flex;
-    flex-direction: row;
-    /* box-sizing: border-box; */
+    display: grid;
+    grid-template-columns: 50% 50%;
     background: white;
 }
 
-.detailPost>img {
-    width: 50%;
+.detailPost > .imageCover {
+    width: 100%;
     height: inherit;
+    position: relative;
+    background-color: #262626;
 }
 
-.detailPost>div {
-    width: 50%;
-    height: inherit;
+.cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
-
 .top {
     padding: 10px 10px;
     display: flex;
