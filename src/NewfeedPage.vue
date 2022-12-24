@@ -4,42 +4,25 @@
     <main>
         <div class="container">
             <div class="col-9">
-                <div class="statuses">
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220604085434/GeeksForGeeks-300x243.png"
-                                alt="img3">
-                        </div>
+                <div v-if="this.listFollow.length > 0" class="statuses">
+                    <div v-for="item in this.listFollow"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <router-link :to="{ name: 'account', params: { id: item.idFollowers }}">
+                            <div class="status">
+                                <div class="image">
+                                    <img :src="item.avatar" alt="img3">
+                                </div>
+                            </div>
+                        </router-link>
+                        <div style="text-align: center; margin-left: 10px; font-size: 10px;">{{ item.nameFollowers }}</div>
                     </div>
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093221/g2-200x200.jpg"
-                                alt="img4">
-                        </div>
+
+                    <div v-on:click="scroll_left()" class="scrollLeft">
+                        <i class="fas fa-angle-left"></i>
                     </div>
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093241/g3-200x200.png"
-                                alt="img5">
-                        </div>
-                    </div>
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093229/g-200x200.png"
-                                alt="img6">
-                        </div>
-                    </div>
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093221/g2-200x200.jpg"
-                                alt="img7">
-                        </div>
-                    </div>
-                    <div class="status">
-                        <div class="image">
-                            <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220604085434/GeeksForGeeks-300x243.png"
-                                alt="img8">
-                        </div>
+
+                    <div v-on:click="scroll_right()" class="scrollRight">
+                        <i class="fas fa-angle-right"></i>
                     </div>
                 </div>
 
@@ -148,7 +131,7 @@
                             <h4 class="comments">Xem tất cả bình luận</h4>
                         </a>
                         <a href="#">
-                            <h5 class="postTime">2 hours ago</h5>
+                            <h5 class="postTime">{{ handleDisplayTime(post.dateCreate) }}</h5>
                         </a>
                         <div class="addComments">
                             <div class="reaction">
@@ -198,8 +181,8 @@
         :likes="this.likes" :method="handleLikePost" />
 
     <!-- Like list -->
-    <!-- <Backdrop v-if="this.openLike !== ''" @open="this.openLike = ''" />
-    <ListLike v-if="this.openLike !== ''" :listLike="this.postDetailLike"/> -->
+    <Backdrop v-if="this.openLike !== ''" @open="this.openLike = ''" />
+    <ListLike v-if="this.openLike !== ''" :listLike="this.postDetailLike" />
 
 </template>
 
@@ -207,7 +190,8 @@
 import Backdrop from './components/Backdrop.vue';
 import DetailPost from './components/NewFeedPost/DetailPost.vue';
 import Header from './components/Header/Header.vue';
-// import ListLike from './ListLike.vue';
+import { getDataFromStorage } from './database/storage'
+import ListLike from './components/NewFeedPost/ListLike.vue';
 import { firestoreDb } from './database/index';
 import { collection, getDocs, doc, deleteDoc, addDoc, setDoc } from "firebase/firestore";
 
@@ -222,6 +206,7 @@ export default ({
         postDetailLike: [],
         openPost: "",
         openLike: '',
+        listFollow: [],
         listSearch: [],
         searchText: '',
         message: '',
@@ -230,9 +215,11 @@ export default ({
         Backdrop,
         DetailPost,
         Header,
-        // ListLike
+        ListLike
     },
     mounted() {
+
+        getDataFromStorage(firestoreDb, 'follow').then(res => this.listFollow = res.filter(i => i.idFollowing === JSON.parse(localStorage.getItem('user')).id));
 
         const getAllPost = async () => {
             let data = [];
@@ -271,7 +258,7 @@ export default ({
         async handleLikePost(postId) {
             const arr = this.likes.filter(i => { return i.idPost.trim().toString() === postId });
             if (arr.length !== 0) {
-                console.log("unlike")
+                // Trường hợp unlike
 
                 let idToRemove = "";
                 let postObject = {};
@@ -284,7 +271,7 @@ export default ({
                 })
 
                 await setDoc(doc(firestoreDb, "posts", postId), postObject);
-                
+
                 this.likes.map(i => {
                     if (i.idPost.trim().toString() === postId) {
                         // i.likes = i.likes - 1;
@@ -297,7 +284,7 @@ export default ({
 
                 return this.likes = this.likes.filter(i => { return i.idPost.trim().toString() !== postId })
             } else {
-                console.log("like");
+                // Trường hợp like
                 const fetchData = async () => {
 
                     let object = {};
@@ -313,7 +300,7 @@ export default ({
 
                     const docRef = await addDoc(collection(firestoreDb, "like"), {
                         idPost: postId,
-                        id: JSON.parse(localStorage.getItem('user')).id,
+                        idUser: JSON.parse(localStorage.getItem('user')).id,
                         name: JSON.parse(localStorage.getItem('user')).username,
                         userName: JSON.parse(localStorage.getItem('user')).username,
                         avatar: JSON.parse(localStorage.getItem('user')).avatar
@@ -344,7 +331,7 @@ export default ({
             // return () => document.body.style.overflow = originalStyle;
             // console.log(this.openPost)
         },
-        handleSubmitComment(id) {
+        async handleSubmitComment(id) {
             if (this.message !== '') {
                 const dateComment = new Date();
                 const handleComment = async () => {
@@ -361,13 +348,16 @@ export default ({
                     this.message = '';
                 }
 
+                let postObject = null;
+                this.posts.filter(i => {if(i.id === id) i.comments++; return postObject = i; return})
+                // console.log(postObject)
+                await setDoc(doc(firestoreDb, "posts", id), postObject);
                 handleComment();
             }
             // else{
             //     alert("Bạn chưa nhập nội dung bình luận")
             // }
         },
-
         handleGetListLike(id) {
             this.openLike = id;
             const getListLike = async () => {
@@ -378,13 +368,47 @@ export default ({
                     if (doc.data().idPost.trim() !== id) return;
                     return data.push({ ...doc.data(), id: doc.id });
                 });
-                console.log(data);
+                // console.log(data);
                 data.sort((a, b) => {
                     return new Date(a.dateCreate).getTime() > new Date(b.dateCreate).getTime() ? 1 : -1;
                 })
                 this.postDetailLike = data;
             }
             getListLike()
+        },
+        handleDisplayTime(date) {
+            const time =
+
+                new Date(Date.now()).getDate()
+                - new Date(date).getDate();
+            if (time > 0) {
+                return `${time} Ngày trước`;
+            } else {
+                const calculateTime =
+                    new Date(Date.now())
+                    - new Date(date);
+                let day = new Date(calculateTime).toUTCString().split(' ')[4];
+                let hours = day.split(':')[0];
+                let minute = day.split(':')[1];
+                let seconds = day.split(':')[2];
+                if (+hours > 0) {
+                    return `${+hours} Tiếng trước`;
+                } else {
+                    if (+minute > 0) {
+                        return `${+minute} Phút trước`;
+                    } else {
+                        return `${+seconds} Giấy trước`;
+                    }
+                }
+            }
+        },
+        scroll_left() {
+            let content = document.querySelector(".statuses");
+            content.scrollLeft -= 1000;
+        },
+        scroll_right() {
+            let content = document.querySelector(".statuses");
+            content.scrollLeft += 900;
         }
     }
 })
@@ -551,7 +575,8 @@ main .container {
     padding: 20px 0;
     border-radius: 2px;
     border: 1px solid rgb(218, 217, 217);
-    overflow: auto;
+    overflow: hidden;
+    scroll-behavior: smooth;
 }
 
 .statuses .status {
@@ -585,6 +610,32 @@ main .container {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.scrollLeft {
+    position: absolute;
+    left: 0.5%;
+    background-color: white;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.scrollRight {
+    position: absolute;
+    right: 35.5%;
+    background-color: white;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 50%;
 }
 
 .col-3 {
@@ -866,6 +917,19 @@ a {
 
     .statuses {
         margin-bottom: 0px;
+    }
+
+    .scrollRight {
+        position: absolute;
+        right: 0.5%;
+        background-color: #1d92ff;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 50%;
     }
 
     .col-9 .card {

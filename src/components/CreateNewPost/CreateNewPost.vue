@@ -104,11 +104,13 @@ export default ({
             const handleCreate = async (url) => {
 
                 const object = {
+                    idAuthor: JSON.parse(localStorage.getItem('user')).id,
                     author: JSON.parse(localStorage.getItem('user')).username,
                     dateCreate: date.toUTCString(),
                     image: url,
                     avatar: JSON.parse(localStorage.getItem('user')).avatar,
                     likes: 0,
+                    comments: 0,
                     title: this.caption
                 }
                 const docRef = await addDoc(collection(firestoreDb, "posts"), object)
