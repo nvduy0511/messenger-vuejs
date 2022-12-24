@@ -1,7 +1,5 @@
 <template>
 	<div class="window-container" :class="{ 'window-mobile': isDevice }">
-		
-
 		<form v-if="inviteRoomId" @submit.prevent="addRoomUser">
 			<input v-model="invitedUsername" type="text" placeholder="Add username" />
 			<button type="submit" :disabled="disableForm || !invitedUsername">
@@ -65,32 +63,87 @@
 				New message container
 			</div> -->
 		</vue-advanced-chat>
-		<v-dialog
-			v-model="addNewRoom"
-			width="500"
-		>
+
+		<!-- Dialog -->
+		<v-dialog v-model="addNewRoom" width="700">
 			<v-card>
 				<v-card-title class="text-h5 grey lighten-2">
-				Privacy Policy
+					Invite User
 				</v-card-title>
-
+				<!-- 
 				<form v-if="addNewRoom" @submit.prevent="createRoom">
 					<input v-model="addRoomUsername" type="text" placeholder="Add username" />
 					<button type="submit" :disabled="disableForm || !addRoomUsername">
 						Create Room
 					</button>
 					<button class="button-cancel" @click="addNewRoom = false">Cancel</button>
-				</form>
+				</form> -->
+				<v-card-text>
+					<v-expansion-panels variant="popout" class="pa-4">
+						<v-expansion-panel
+							v-for="(message, i) in messageList"
+							:key="i"
+							hide-actions
+						>
+							<v-expansion-panel-title color="white">
+								<v-row align="center" class="spacer" no-gutters>
+									<v-col class="hidden-xs-only text-left ml-2" sm="5" md="3">
+										<v-checkbox color="red"></v-checkbox>
+									</v-col>
+									<v-col cols="4" sm="2" md="1">
+										<v-avatar size="36px">
+											<v-img
+												v-if="message.avatar"
+												alt="Avatar"
+												src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+											></v-img>
+											<v-icon
+												v-else
+												:color="message.color"
+												:icon="message.icon"
+											></v-icon>
+										</v-avatar>
+									</v-col>
+
+									<v-col class="hidden-xs-only text-left ml-2" sm="5" md="3">
+										<strong v-html="message.name"></strong>
+									</v-col>
+								</v-row>
+							</v-expansion-panel-title>
+
+							<v-expansion-panel-text>
+								<v-row>
+									<v-col cols="6" sm="4">
+										<v-img
+											src="https://cdn.vuetifyjs.com/images/parallax/material2.jpg"
+											gradient="to top right, rgba(100,115,201,.33), rgba(25,32,72,.7)"
+										></v-img>
+									</v-col>
+
+									<v-col cols="6" sm="4">
+										<v-img
+											src="https://cdn.vuetifyjs.com/images/parallax/material2.jpg"
+										>
+											<div class="fill-height bottom-gradient"></div>
+										</v-img>
+									</v-col>
+
+									<v-col cols="6" sm="4">
+										<v-img
+											src="https://cdn.vuetifyjs.com/images/parallax/material2.jpg"
+										>
+											<div class="fill-height repeating-gradient"></div>
+										</v-img>
+									</v-col>
+								</v-row>
+							</v-expansion-panel-text>
+						</v-expansion-panel>
+					</v-expansion-panels>
+				</v-card-text>
 
 				<v-card-actions>
-				<v-spacer></v-spacer>
-				<v-btn
-					color="primary"
-					text
-					@click="addNewRoom = false"
-				>
-					I accept
-				</v-btn>
+					<v-spacer></v-spacer>
+					<v-btn text @click="addNewRoom = false"> OK </v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -173,8 +226,34 @@ export default {
 					tag: 'action 2',
 					text: 'This is the second action'
 				}
-			]
+			],
 			// ,dbRequestCount: 0
+			messageList: [
+				{
+					avatar: 'https://avatars0.githubusercontent.com/u/9064066?v=4&s=460',
+					name: 'John Leider',
+					title: 'Welcome to Vuetify!',
+					excerpt: 'Thank you for joining our community...'
+				},
+				{
+					color: 'red',
+					icon: 'mdi-account-multiple',
+					name: 'Social',
+					new: 1,
+					total: 3,
+					title: 'Twitter'
+				},
+				{
+					color: 'teal',
+					icon: 'mdi-tag',
+					name: 'Promos',
+					new: 2,
+					total: 4,
+					title: 'Shop your way',
+					exceprt: 'New deals available, Join Today'
+				}
+			],
+			images: []
 		}
 	},
 
