@@ -1,5 +1,5 @@
 import { storage } from '@/database'
-
+import { collection, getDocs, doc, deleteDoc, addDoc, setDoc } from "firebase/firestore";
 import {
 	deleteObject,
 	getDownloadURL,
@@ -66,4 +66,19 @@ export const listenUploadImageProgress = (
 			success(url)
 		}
 	)
+}
+
+export const getDataFromStorage = async (firestoreDb, nameCollection) => {
+	let data = [];
+	const querySnapshot = await getDocs(collection(firestoreDb, nameCollection));
+	querySnapshot.forEach((doc) => {
+		// console.log(doc.data().dateCreate)
+		return data.push({ ...doc.data(), id: doc.id });
+	});
+	// console.log(data);
+	// data.sort((a, b) => {
+	// 	// console.log(a.dateCreate.toString())
+	// 	return new Date(a.dateCreate).getTime() < new Date(b.dateCreate).getTime() ? 1 : -1;
+	// })
+	return data;
 }

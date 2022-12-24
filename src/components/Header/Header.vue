@@ -34,8 +34,8 @@
                     <ul class="nav-group">
                         <li>
                             <router-link to="/">
-                                <svg aria-label="Home" class="_ab6-" color="#262626" fill="#262626" height="24" role="img"
-                                    viewBox="0 0 24 24" width="24">
+                                <svg aria-label="Home" class="_ab6-" color="#262626" fill="#262626" height="24"
+                                    role="img" viewBox="0 0 24 24" width="24">
                                     <path
                                         d="M22 23h-6.001a1 1 0 0 1-1-1v-5.455a2.997 2.997 0 1 0-5.993 0V22a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V11.543a1.002 1.002 0 0 1 .31-.724l10-9.543a1.001 1.001 0 0 1 1.38 0l10 9.543a1.002 1.002 0 0 1 .31.724V22a1 1 0 0 1-1 1Z">
                                     </path>
@@ -44,16 +44,19 @@
                         </li>
 
                         <li>
-                            <svg aria-label="Direct" class="_ab6-" color="#262626" fill="#262626" height="24" role="img"
-                                viewBox="0 0 24 24" width="24">
-                                <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2" x1="22"
-                                    x2="9.218" y1="3" y2="10.083"></line>
-                                <polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
-                                    stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
-                            </svg>
+                            <router-link to="/chat">
+                                <svg aria-label="Direct" class="_ab6-" color="#262626" fill="#262626" height="24"
+                                    role="img" viewBox="0 0 24 24" width="24">
+                                    <line fill="none" stroke="currentColor" stroke-linejoin="round" stroke-width="2"
+                                        x1="22" x2="9.218" y1="3" y2="10.083"></line>
+                                    <polygon fill="none"
+                                        points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
+                                        stroke="currentColor" stroke-linejoin="round" stroke-width="2"></polygon>
+                                </svg>
+                            </router-link>
                         </li>
 
-                        <li v-on:click="this.createNewPost = true" >
+                        <li v-on:click="this.createNewPost = true">
                             <svg aria-label="New post" class="_ab6-" color="#262626" fill="#262626" height="24"
                                 role="img" viewBox="0 0 24 24" width="24">
                                 <path
@@ -61,22 +64,47 @@
                                     fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2">
                                 </path>
-                                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="6.545" x2="17.455" y1="12.001" y2="12.001"></line>
-                                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line>
+                                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" x1="6.545" x2="17.455" y1="12.001" y2="12.001"></line>
+                                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line>
                             </svg>
                         </li>
 
                         <li>
-                            <router-link to="/account">
-                                <div class="profilepic">
-                                    <div class="profile_img">
-                                        <div class="image">
-                                            <img :src="getAvatar"
-                                                alt="img8">
+
+                            <tippy interactive :animate-fill="false" aria-expanded="true" placement="bottom" distant="6"
+                                theme="light" animation="fade" trigger="click" style="width: 100%">
+                                <template #default>
+                                    <div class="profilepic">
+                                        <div class="profile_img">
+                                            <div class="image">
+                                                <img :src="getAvatar" alt="img8">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </router-link>
+                                </template>
+                                <template #content>
+                                    <!-- <SearchRes :listSearch="this.listSearch" /> -->
+                                    <div class="userNavbar">
+                                        <ul>
+                                            <li v-on:click="redirectId" >
+                                                <!-- <router-link :to="{ name: 'account', params: { idU: getId } }" -->
+                                                    <!-- style="text-decoration: none; color: rgb(172, 172, 172);"> -->
+                                                    <i class="far fa-user-circle"></i>
+                                                    <span style="margin-left: 10px;">Tài khoản</span>
+                                                <!-- </router-link> -->
+                                            </li>
+                                            <li v-on:click="handleLogOut()">
+                                                <!-- <router-link to="/login"> -->
+                                                Đăng xuất
+                                                <!-- </router-link> -->
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </template>
+                            </tippy>
+
                         </li>
                     </ul>
                 </div>
@@ -86,7 +114,7 @@
 
     <!-- Hiện thị khung tạo bài viết mới -->
     <Backdrop v-if="this.createNewPost" @open="createNewPost = !createNewPost" />
-    <CreateNewPost v-if="this.createNewPost" :posts="this.posts" :method="closeCreatePost"/>
+    <CreateNewPost v-if="this.createNewPost" :posts="this.posts" :method="closeCreatePost" />
 
 </template>
 
@@ -117,6 +145,7 @@ export default ({
         listSearch: [],
         searchText: '',
         createNewPost: false,
+        idUser: null,
         debounce: createDebounce(),
     }),
     components: {
@@ -133,24 +162,37 @@ export default ({
             const fetchData = async () => {
 
                 let data = [];
-                const querySnapshot = await getDocs(collection(firestoreDb, "accounts"));
+                const querySnapshot = await getDocs(collection(firestoreDb, "users"));
                 querySnapshot.forEach((doc) => {
-                    if (doc.data().userName === value) {
+                    if (doc.data().username === value) {
                         return data.push({ ...doc.data(), id: doc.id });
                     }
                 });
                 // console.log(data);
                 this.listSearch = data;
             }
-            fetchData();
             this.searchText = value;
+            fetchData();
         },
-        closeCreatePost(){
+        closeCreatePost() {
             this.createNewPost = !this.createNewPost;
+        },
+        redirectId() {
+            this.$router.push({
+                name: 'account',
+                params: {
+                    id: JSON.parse(localStorage.getItem('user')).id
+                }
+            })
+        },
+        handleLogOut(){
+            localStorage.clear();
+            this.$router.push('/login');
+            window.location.reload(true)
         }
     },
     computed: {
-        getAvatar(){
+        getAvatar() {
             return JSON.parse(localStorage.getItem('user')).avatar;
         }
     }
@@ -326,6 +368,22 @@ export default ({
 input.text::placeholder {
     color: #777;
 } */
+.userNavbar {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    height: fit-content;
+    width: 200px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    text-decoration: none;
+}
+
+.userNavbar ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
 @media screen and (max-width: 1000px) {
     .col-9 {

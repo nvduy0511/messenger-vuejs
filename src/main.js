@@ -19,10 +19,9 @@ const vuetify = createVuetify({
 })
 
 const routes = [
-	{ path: '/', component: NewFeedPage,},
-	{ path: '/account', component: UserInfo,},
-
-	// { path: '/', component: Home, meta: { requiresAuth: true } },
+	{ path: '/', component: NewFeedPage, meta: { requiresAuth: true }},
+	{ path: '/account/:id', name: 'account', component: UserInfo, meta: { requiresAuth: true }},
+	{ path: '/chat', component: Home, meta: { requiresAuth: true } },
 	{ path: '/login', component: Login }
 ]
 export const router = createRouter({

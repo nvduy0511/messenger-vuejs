@@ -9,28 +9,30 @@
 
             <div class="profile-image">
 
-                <img src="https://images.unsplash.com/photo-1513721032312-6a18a42c8763?w=152&h=152&fit=crop&crop=faces"
-                    alt="">
+                <img :src="this.info.avatar" alt="avartar">
 
             </div>
 
             <div class="profile-user-settings">
 
-                <h1 class="profile-user-name">janedoe_</h1>
+                <h1 class="profile-user-name">{{ this.info.username }}</h1>
 
-                <button class="btn profile-edit-btn">Edit Profile</button>
+                <button class="btn profile-edit-btn">Chỉnh sửa thông tin</button>
 
                 <button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog"
                         aria-hidden="true"></i></button>
+
+                <button v-if="handleDisplayFollow()" v-on:click="handleFollow()" class="btn profile-edit-btn">
+                    {{ this.isFollow === false ? 'Theo dõi' : 'Đang theo dõi' }}</button>
 
             </div>
 
             <div class="profile-stats">
 
                 <ul>
-                    <li><span class="profile-stat-count">164</span> posts</li>
-                    <li><span class="profile-stat-count">188</span> followers</li>
-                    <li><span class="profile-stat-count">206</span> following</li>
+                    <li><span class="profile-stat-count">{{ this.posts.length }}</span> bài viết</li>
+                    <li v-on:click="this.openList = true; this.type = 'Followers'"><span class="profile-stat-count">{{ this.followers.length }}</span> Người theo dõi</li>
+                    <li  v-on:click="this.openList = true; this.type = 'Following'"><span class="profile-stat-count">{{ this.following.length }}</span> đang theo dõi</li>
                 </ul>
 
             </div>
@@ -56,289 +58,124 @@
 
             <div class="gallery">
 
-                <div class="gallery-item" tabindex="0">
+                <div v-for="item in this.posts" class="gallery-item" tabindex="0">
 
-                    <img src="https://images.unsplash.com/photo-1511765224389-37f0e77cf0eb?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
+                    <img :src="item.image" class="gallery-image" alt="">
 
                     <div class="gallery-item-info">
 
                         <ul>
                             <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span>
-                                <svg aria-label="Unlike" class="_ab6-" color="#ed4956" fill="#ed4956" height="24"
-                                    role="img" viewBox="0 0 48 48" width="24">
-                                    <path
-                                        d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
-                                    </path>
-                                </svg>
-
-                                56
+                                <i class="fas fa-heart"></i> {{ item.likes }}
                             </li>
                             <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 2</li>
+                                    class="fas fa-comment" aria-hidden="true"></i> {{ item.comments }}</li>
                         </ul>
 
                     </div>
 
                 </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1497445462247-4330a224fdb1?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 89</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 5</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 42</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1502630859934-b3b41d18206c?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Video</span><i class="fas fa-video" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 38</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1498471731312-b6d2b8280c61?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 47</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1515023115689-589c33041d3c?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 94</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 3</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 52</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 4</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1515814472071-4d632dbc5d4a?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 66</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 2</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1511407397940-d57f68e81203?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Gallery</span><i class="fas fa-clone" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 45</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1518481612222-68bbe828ecd1?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 34</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 1</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1505058707965-09a4469a87e4?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 41</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 0</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="gallery-item" tabindex="0">
-
-                    <img src="https://images.unsplash.com/photo-1423012373122-fff0a5d28cc9?w=500&h=500&fit=crop"
-                        class="gallery-image" alt="">
-
-                    <div class="gallery-item-type">
-
-                        <span class="visually-hidden">Video</span><i class="fas fa-video" aria-hidden="true"></i>
-
-                    </div>
-
-                    <div class="gallery-item-info">
-
-                        <ul>
-                            <li class="gallery-item-likes"><span class="visually-hidden">Likes:</span><i
-                                    class="fas fa-heart" aria-hidden="true"></i> 30</li>
-                            <li class="gallery-item-comments"><span class="visually-hidden">Comments:</span><i
-                                    class="fas fa-comment" aria-hidden="true"></i> 2</li>
-                        </ul>
-
-                    </div>
-
-                </div>
-
             </div>
             <!-- End of gallery -->
 
-            <div class="loader"></div>
+            <!-- <div class="loader"></div> -->
 
         </div>
         <!-- End of container -->
 
     </main>
+
+    <Backdrop  v-if="openList" @open="openList = false"  />
+    <ListFollow v-if="openList" :type="this.type" :followers="this.followers" :following="this.following" />
 </template>
 
 <script>
 
 import Header from './components/Header/Header.vue';
-
+import Backdrop from './components/Backdrop.vue';
+import ListFollow from './components/InfoUser/ListFollow.vue';
+import { firestoreDb } from './database/index';
+import { getDataFromStorage } from './database/storage';
+import { collection, getDocs, doc, deleteDoc, addDoc, setDoc } from "firebase/firestore";
 
 
 export default ({
 
     name: "user",
+    data: () => ({
+        info: {},
+        posts: [],
+        isFollow: false,
+        infoFollow: null,
+        openList: false,
+        type: null,
+        following: [],
+        followers: [],
+    }),
     components: {
         Header,
-    }
+        ListFollow,
+        Backdrop,
+    },
+    mounted() {
+        // this.info = JSON.parse(localStorage.getItem('user'));
+        getDataFromStorage(firestoreDb, 'users')
+            .then(res =>
+                res.filter(i => {
+                    if (i.id === this.$route.params.id) {
+                        return this.info = i;
+                    }
+                }))
+
+        // Lấy danh sách bài đăng
+        getDataFromStorage(firestoreDb, 'posts')
+            .then(res => this.posts = res.filter(i => i.idAuthor === this.info.id))
+
+            // Lấy danh sách người theo dõi
+        getDataFromStorage(firestoreDb, 'follow')
+            .then(res => this.followers = res.filter(i => i.idFollowers === this.$route.params.id))
+
+        // Lấy danh sách người đang theo dõi
+        getDataFromStorage(firestoreDb, 'follow')
+            .then(res => this.following = res.filter(i => i.idFollowing === this.$route.params.id))
+    },
+    methods: {
+        handleDisplayFollow() {
+            if (this.info.id === JSON.parse(localStorage.getItem('user')).id) return false;
+
+            getDataFromStorage(firestoreDb, 'follow')
+                .then(res => {
+                    const arr = res.filter(i => i.idFollowing === JSON.parse(localStorage.getItem('user')).id && i.idFollowers === this.$route.params.id);
+                    if (arr.length > 0) {
+                        arr.map(i => this.infoFollow = i)
+                        return this.isFollow = true;
+                    }
+                    return;
+                })
+
+            // console.log(this.following)
+
+            return true;
+        },
+        async handleFollow() {
+            // console.log(this.$route.params.id)
+            if (this.isFollow === false) {
+                const docRef = await addDoc(collection(firestoreDb, "follow"), {
+                    dateFollow: new Date(Date.now()).toUTCString(),
+                    avatar: this.info.avatar,
+                    nameFollowers: this.info.username,
+                    idFollowers: this.$route.params.id,
+                    idFollowing: JSON.parse(localStorage.getItem('user')).id,
+                    nameFollowing: JSON.parse(localStorage.getItem('user')).username,
+                    avatarFollowing: JSON.parse(localStorage.getItem('user')).avatar,
+                })
+                return this.isFollow = true;
+            }
+            // console.log(this.infoFollow.id)
+            await deleteDoc(doc(firestoreDb, "follow", this.infoFollow.id));
+            return this.isFollow = false;
+        }
+    },
 }
 )
 </script>
@@ -434,7 +271,7 @@ img {
 
 .profile-user-name {
     display: inline-block;
-    font-size: 3.2rem;
+    font-size: 1.5rem;
     font-weight: 300;
 }
 
@@ -484,10 +321,12 @@ img {
 /* Gallery Section */
 
 .gallery {
-    display: flex;
-    flex-wrap: wrap;
+    /* display: flex;
+    flex-wrap: wrap; */
     margin: -1rem -1rem;
     padding-bottom: 3rem;
+    display: grid;
+    grid-template-columns: calc(100% / 3) calc(100% / 3) calc(100% / 3);
 }
 
 .gallery-item {
@@ -503,6 +342,7 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
+
     position: absolute;
     top: 0;
     width: 100%;

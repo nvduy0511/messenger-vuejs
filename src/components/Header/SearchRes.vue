@@ -1,11 +1,11 @@
 <template #content >
     <div class="containerSearch">
 
-        <div v-for="item in this.listSearch" class="searchItem">
-            <img :src="item.avartar" />
+        <div v-for="item in this.listSearch" :key="item.id" v-on:click="redirectId(item.id)" class="searchItem">
+            <img :src="item.avatar" />
             <div>
-                <p class="userName">{{ item.userName }}</p>
-                <p class="name">{{ item.name }}</p>
+                <p class="userName">{{ item.username }}</p>
+                <!-- <p class="name">{{ item.name }}</p> -->
             </div>
         </div>
 
@@ -21,6 +21,16 @@ export default ({
     data: () => ({
         listRes: [],
     }),
+    methods: {
+        redirectId(id) {
+            this.$router.push({
+                name: 'account',
+                params: {
+                    id: id
+                }
+            })
+        }
+    },
 })
 </script>
 
@@ -51,7 +61,7 @@ export default ({
 
 }
 
-.searchItem > img {
+.searchItem>img {
     width: 50px;
     height: 50px;
     border-radius: 50%;

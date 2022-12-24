@@ -105,7 +105,7 @@
                     </div>
                 </div>
     
-                <a href="#">
+                <a v-on:click="handleGetListLike(dataPost.id)" style="cursor: pointer;">
                     <p ref="likePost" class="likes">{{ dataPost.likes }} lượt thích</p>
     
                 </a>
@@ -127,12 +127,18 @@
 
         </div>
     </div>
+
+    <!-- List like -->
+    <Backdrop v-if="this.openListLike" style="z-index: 22;" @open="this.openListLike = false" />
+    <ListLike v-if="this.openListLike" :listLike="this.postDetailLike"/>
+
 </template>
 
 <script>
-// import axios from 'axios';
+import Backdrop from '../Backdrop.vue';
+import ListLike from './ListLike.vue';
 import { firestoreDb } from '../../database/index';
-import { collection, getDocs, doc, deleteDoc, addDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, addDoc,setDoc } from "firebase/firestore";
 
 
 export default {
@@ -143,9 +149,15 @@ export default {
         // likes: [],
         comments: '',
         message: '',
+        openListLike: false,
+        postDetailLike: [],
         // openPost: "",
         // like: false,
     }),
+    components: {
+        ListLike,
+        Backdrop,
+    },
     // computed: {
     //     getComment() {
     //         console.log("run")
@@ -174,7 +186,7 @@ export default {
 
     },
     methods: {
-        handleSubmitComment(id) {
+        async handleSubmitComment(id) {
             if (this.message !== '') {
                 const dateComment = new Date();
                 const handleComment = async () => {
@@ -188,11 +200,16 @@ export default {
                         dateComment: dateComment.toUTCString(),
                     }
 
-                    const docRef = await addDoc(collection(firestoreDb, "comments"), object)
+                  await addDoc(collection(firestoreDb, "comments"), object)
 
                     this.comments.push(object)
                     this.message = '';
                 }
+
+                let postObject = null;
+                this.posts.filter(i => {if(i.id === id) i.comments++; return postObject = i; return})
+                // console.log(d)
+                await setDoc(doc(firestoreDb, "posts", id), postObject);
 
                 handleComment();
             }
@@ -211,6 +228,24 @@ export default {
         handleLikePost(postId) {
             this.method(postId);
         },
+        handleGetListLike(id) {
+            this.openListLike = true;
+            const getListLike = async () => {
+                let data = [];
+                const querySnapshot = await getDocs(collection(firestoreDb, "like"));
+                querySnapshot.forEach((doc) => {
+                    // console.log(doc.data());
+                    if (doc.data().idPost.trim() !== id) return;
+                    return data.push({ ...doc.data(), id: doc.id });
+                });
+                console.log(data);
+                data.sort((a, b) => {
+                    return new Date(a.dateCreate).getTime() > new Date(b.dateCreate).getTime() ? 1 : -1;
+                })
+                this.postDetailLike = data;
+            }
+            getListLike()
+        }
     }
 }
 </script>
