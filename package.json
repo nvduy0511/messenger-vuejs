@@ -16,8 +16,11 @@
 		"latest": "npm i https://github.com/antoine92190/vue-advanced-chat/tarball/master"
 	},
 	"dependencies": {
+		"@mdi/font": "^7.0.96",
 		"firebase": "^9.14.0",
 		"firebaseui": "^6.0.2",
+		"material-design-icons-iconfont": "^6.7.0",
+		"tailwindcss": "^3.2.4",
 		"vue": "3.2.37",
 		"vue-advanced-chat": "latest",
 		"vue-router": "^4.1.6",

@@ -1,42 +1,9 @@
 <template>
 	<div>
 		<div
-			class="app-container"
+			class="app-container" style="position: relative;"
 			:class="{ 'app-mobile': isDevice, 'app-mobile-dark': theme === 'dark' }"
 		>
-			<!-- <div>
-				<button @click="resetData">
-					Clear Data
-				</button>
-				<button :disabled="updatingData" @click="addData">
-					Add Data
-				</button>
-			</div> -->
-			<span
-				v-if="showOptions"
-				class="user-logged"
-				:class="{ 'user-logged-dark': theme === 'dark' }"
-			>
-				Logged as
-			</span>
-			<select v-if="showOptions" v-model="currentUserId">
-				<option v-for="user in users" :key="user._id" :value="user._id">
-					{{ user.username }}
-				</option>
-			</select>
-
-			<div v-if="showOptions" class="button-theme">
-				<button class="button-light" @click="theme = 'light'">
-					Light
-				</button>
-				<button class="button-dark" @click="theme = 'dark'">
-					Dark
-				</button>
-				<button class="button-github" >
-					<a href="/login">LogOut</a>
-				</button>
-			</div>
-
 			<chat-container
 				v-if="showChat"
 				:current-user-id="currentUserId"
@@ -44,7 +11,9 @@
 				:is-device="isDevice"
 				@show-demo-options="showDemoOptions = $event"
 			/>
-
+			<!-- <div style="position: fixed; bottom:10px; left:20px;" >
+				<v-switch  label="dark" color="red" />	
+			</div> -->
 			<!-- <div class="version-container">
 				v1.0.0
 			</div> -->
@@ -196,7 +165,7 @@ input {
 
 .app-container {
 	font-family: 'Quicksand', sans-serif;
-	padding: 20px 30px 0px 30px;
+	padding: 0px;
 }
 
 .app-mobile {

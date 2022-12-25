@@ -5,7 +5,6 @@
                 <router-link to="/" style="text-decoration: none;">
                     <div class="logo">
                         <img src="../../assets/logo_transparent.png" />
-                        <p>WatchChat</p>
                     </div>
                 </router-link>
                 <div class="searchbar">
