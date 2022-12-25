@@ -3,9 +3,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import Login from './Login.vue'
 import Home from './Home.vue'
+<<<<<<< HEAD
 import NewFeedPage from './NewfeedPage.vue'
-import UserInfo from './UserInfo.vue'
-import EditInfo from './EditInfo.vue'
+import UserInfo from './UserInfo.vue';
+import EditInfo from './EditInfo.vue';
+=======
+>>>>>>> feat/messenger
 import { createRouter, createWebHistory } from 'vue-router'
 
 // Vuetify
@@ -21,10 +24,14 @@ const vuetify = createVuetify({
 })
 
 const routes = [
+<<<<<<< HEAD
 	{ path: '/', component: NewFeedPage, meta: { requiresAuth: true }},
 	{ path: '/account/:id', name: 'account', component: UserInfo, meta: { requiresAuth: true }},
 	{ path: '/account/edit', name: 'edit', component: EditInfo, meta: { requiresAuth: true }},
 	{ path: '/chat', component: Home, meta: { requiresAuth: true } },
+=======
+	{ path: '/', component: Home, meta: { requiresAuth: true } },
+>>>>>>> feat/messenger
 	{ path: '/login', component: Login }
 ]
 export const router = createRouter({
