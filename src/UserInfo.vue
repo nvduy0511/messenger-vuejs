@@ -17,7 +17,7 @@
 
                 <h1 class="profile-user-name">{{ this.info.username }}</h1>
 
-                <button class="btn profile-edit-btn">Chỉnh sửa thông tin</button>
+                <button v-on:click="handleOpenEdit()" class="btn profile-edit-btn">Chỉnh sửa thông tin</button>
 
                 <button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog"
                         aria-hidden="true"></i></button>
@@ -31,17 +31,23 @@
 
                 <ul>
                     <li><span class="profile-stat-count">{{ this.posts.length }}</span> bài viết</li>
-                    <li v-on:click="this.openList = true; this.type = 'Followers'"><span class="profile-stat-count">{{ this.followers.length }}</span> Người theo dõi</li>
-                    <li  v-on:click="this.openList = true; this.type = 'Following'"><span class="profile-stat-count">{{ this.following.length }}</span> đang theo dõi</li>
+                    <li v-on:click="this.openList = true; this.type = 'Followers'"><span class="profile-stat-count">{{
+                            this.followers.length
+                    }}</span> Người theo dõi</li>
+                    <li v-on:click="this.openList = true; this.type = 'Following'"><span class="profile-stat-count">{{
+                            this.following.length
+                    }}</span> đang theo dõi</li>
                 </ul>
 
             </div>
 
             <div class="profile-bio">
 
-                <p><span class="profile-real-name">Jane Doe</span> Lorem ipsum dolor sit, amet consectetur
-                    adipisicing elit 📷✈️🏕️</p>
+                <p>
+                    <!-- <span class="profile-real-name">Jane Doe</span>  -->
 
+                    {{ this.info.bio !== undefined ? this.info.bio : '' }}
+                </p>
             </div>
 
         </div>
@@ -85,7 +91,7 @@
 
     </main>
 
-    <Backdrop  v-if="openList" @open="openList = false"  />
+    <Backdrop v-if="openList" @open="openList = false" />
     <ListFollow v-if="openList" :type="this.type" :followers="this.followers" :following="this.following" />
 </template>
 
@@ -131,7 +137,7 @@ export default ({
         getDataFromStorage(firestoreDb, 'posts')
             .then(res => this.posts = res.filter(i => i.idAuthor === this.info.id))
 
-            // Lấy danh sách người theo dõi
+        // Lấy danh sách người theo dõi
         getDataFromStorage(firestoreDb, 'follow')
             .then(res => this.followers = res.filter(i => i.idFollowers === this.$route.params.id))
 
@@ -174,6 +180,9 @@ export default ({
             // console.log(this.infoFollow.id)
             await deleteDoc(doc(firestoreDb, "follow", this.infoFollow.id));
             return this.isFollow = false;
+        },
+        handleOpenEdit() {
+            this.$router.push({ name: 'edit' })
         }
     },
 }
@@ -247,7 +256,6 @@ img {
 
 .profile-image {
     float: left;
-    width: calc(33.333% - 1rem);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -255,6 +263,7 @@ img {
 }
 
 .profile-image img {
+    width: calc(33.333% - 1rem);
     border-radius: 50%;
 }
 

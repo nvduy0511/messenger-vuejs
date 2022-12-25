@@ -5,6 +5,7 @@ import Login from './Login.vue'
 import Home from './Home.vue'
 import NewFeedPage from './NewfeedPage.vue'
 import UserInfo from './UserInfo.vue';
+import EditInfo from './EditInfo.vue';
 import { createRouter, createWebHistory } from 'vue-router'
 
 // Vuetify
@@ -21,6 +22,7 @@ const vuetify = createVuetify({
 const routes = [
 	{ path: '/', component: NewFeedPage, meta: { requiresAuth: true }},
 	{ path: '/account/:id', name: 'account', component: UserInfo, meta: { requiresAuth: true }},
+	{ path: '/account/edit', name: 'edit', component: EditInfo, meta: { requiresAuth: true }},
 	{ path: '/chat', component: Home, meta: { requiresAuth: true } },
 	{ path: '/login', component: Login }
 ]
