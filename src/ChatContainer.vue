@@ -1,12 +1,12 @@
 <template>
 	<div class="window-container" :class="{ 'window-mobile': isDevice }">
-		<form v-if="inviteRoomId" @submit.prevent="addRoomUser">
+		<!-- <form v-if="inviteRoomId" @submit.prevent="addRoomUser">
 			<input v-model="invitedUsername" type="text" placeholder="Add username" />
 			<button type="submit" :disabled="disableForm || !invitedUsername">
 				Add User
 			</button>
 			<button class="button-cancel" @click="inviteRoomId = null">Cancel</button>
-		</form>
+		</form> -->
 
 		<form v-if="removeRoomId" @submit.prevent="deleteRoomUser">
 			<select v-model="removeUserId">
@@ -70,8 +70,8 @@
 				<v-card-title class="text-h5 grey lighten-2">
 					Invite User
 				</v-card-title>
-				<!-- 
-				<form v-if="addNewRoom" @submit.prevent="createRoom">
+				
+				<!-- <form v-if="addNewRoom" @submit.prevent="createRoom">
 					<input v-model="addRoomUsername" type="text" placeholder="Add username" />
 					<button type="submit" :disabled="disableForm || !addRoomUsername">
 						Create Room
@@ -81,46 +81,45 @@
 				<v-card-text>
 					<v-expansion-panels variant="popout" class="pa-4">
 						<v-expansion-panel
-							v-for="(message, i) in messageList"
+							v-for="(user, i) in users"
 							:key="i"
 							hide-actions
 						>
 							<v-expansion-panel-title color="white">
 								<v-row align="center" class="spacer" no-gutters>
-									<v-col class="hidden-xs-only text-left ml-2" sm="5" md="3">
-										<v-checkbox color="red"></v-checkbox>
-									</v-col>
-									<v-col cols="4" sm="2" md="1">
+									<div class="bg-red-900 flex" sm="5" md="3">
+										<v-checkbox @change="changeSeletedUser($event, user._id)" color="red" class=" bg-red-900 items-center"></v-checkbox>
+									</div>
+									<div class="ml-5">
 										<v-avatar size="36px">
 											<v-img
-												v-if="message.avatar"
+												v-if="user.avatar"
 												alt="Avatar"
-												src="https://avatars0.githubusercontent.com/u/9064066?v=4&s=460"
+												v-bind:src="user.avatar"
 											></v-img>
-											<v-icon
+											<v-img
 												v-else
-												:color="message.color"
-												:icon="message.icon"
-											></v-icon>
+												alt="Avatar"
+												src="https://vdostavka.ru/wp-content/uploads/2019/05/no-avatar.png"
+											></v-img>
 										</v-avatar>
-									</v-col>
-
-									<v-col class="hidden-xs-only text-left ml-2" sm="5" md="3">
-										<strong v-html="message.name"></strong>
-									</v-col>
+										<strong class="ml-3" v-html="user.username"></strong>
+									</div>
 								</v-row>
 							</v-expansion-panel-title>
 
 							<v-expansion-panel-text>
-								<v-row>
-									<v-col cols="6" sm="4">
-										<v-img
-											src="https://cdn.vuetifyjs.com/images/parallax/material2.jpg"
-											gradient="to top right, rgba(100,115,201,.33), rgba(25,32,72,.7)"
-										></v-img>
+								<!-- <div v-for="(image,i) in user.images" :key="i">
+										<img
+											v-if="image"
+											v-bind:src="image"/>
+								</div> -->
+								<v-row >
+									<v-col v-for="(image,i) in user.images" :key="i" cols="6" sm="4">
+										<v-img style="height: 120px;" v-bind:src="image"/>
 									</v-col>
 
-									<v-col cols="6" sm="4">
+									<!-- <v-col cols="6" sm="4">
 										<v-img
 											src="https://cdn.vuetifyjs.com/images/parallax/material2.jpg"
 										>
@@ -134,7 +133,7 @@
 										>
 											<div class="fill-height repeating-gradient"></div>
 										</v-img>
-									</v-col>
+									</v-col> -->
 								</v-row>
 							</v-expansion-panel-text>
 						</v-expansion-panel>
@@ -143,7 +142,8 @@
 
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn text @click="addNewRoom = false"> OK </v-btn>
+					<v-btn v-if="inviteRoomId" text @click="addRoomUser"> OK </v-btn>
+					<v-btn v-else text @click="createRoom"> OK </v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -213,47 +213,12 @@ export default {
 			messageSelectionActions: [{ name: 'deleteMessages', title: 'Delete' }],
 			// eslint-disable-next-line vue/no-unused-properties
 			styles: { container: { borderRadius: '4px' } },
-			templatesText: [
-				{
-					tag: 'help',
-					text: 'This is the help'
-				},
-				{
-					tag: 'action',
-					text: 'This is the action'
-				},
-				{
-					tag: 'action 2',
-					text: 'This is the second action'
-				}
-			],
+			
 			// ,dbRequestCount: 0
-			messageList: [
-				{
-					avatar: 'https://avatars0.githubusercontent.com/u/9064066?v=4&s=460',
-					name: 'John Leider',
-					title: 'Welcome to Vuetify!',
-					excerpt: 'Thank you for joining our community...'
-				},
-				{
-					color: 'red',
-					icon: 'mdi-account-multiple',
-					name: 'Social',
-					new: 1,
-					total: 3,
-					title: 'Twitter'
-				},
-				{
-					color: 'teal',
-					icon: 'mdi-tag',
-					name: 'Promos',
-					new: 2,
-					total: 4,
-					title: 'Shop your way',
-					exceprt: 'New deals available, Join Today'
-				}
-			],
-			images: []
+			
+			images: [],
+			users:[] ,
+			userSelected: []
 		}
 	},
 
@@ -262,18 +227,37 @@ export default {
 			return this.rooms.slice(0, this.roomsLoadedCount)
 		},
 		screenHeight() {
-			return this.isDevice ? window.innerHeight + 'px' : 'calc(100vh - 80px)'
+			return this.isDevice ? window.innerHeight + 'px' : 'calc(100vh)'
 		}
 	},
 
 	mounted() {
 		this.addCss()
-
 		this.fetchRooms()
 		firebaseService.updateUserOnlineStatus(this.currentUserId)
+		this.fetchUsers()
 	},
 
 	methods: {
+		changeSeletedUser(event, idUser){
+			if(event.target.checked){
+				this.userSelected = [...this.userSelected, idUser];
+			}
+			else
+			{
+				var index = this.userSelected.indexOf(idUser);
+				if (index !== -1) {
+					this.userSelected.splice(index, 1);
+				}
+			}
+			console.log(this.userSelected);
+		},
+		async fetchUsers()
+		{
+			const res = await firestoreService.getAllUsers();
+			this.users = res.data;
+			console.log(this.users)
+		},
 		async addCss() {
 			if (import.meta.env.MODE === 'development') {
 				const styles = await import('./styles/index.scss')
@@ -882,57 +866,37 @@ export default {
 
 		async createRoom() {
 			this.disableForm = true
+			this.userSelected = [...this.userSelected, this.currentUserId];
 
-			const users = await firestoreService.getUserByName(this.addRoomUsername)
-			if (users.data.length !== 0) {
+			// const users = await firestoreService.getUserByName(this.addRoomUsername)
+
+			if (this.userSelected.length !== 0) {
 				await firestoreService.addRoom({
-					users: [users.data[0].id, this.currentUserId],
+					users: this.userSelected,
 					lastUpdated: new Date()
 				})
-				// await firestoreService.addRoomUser(this.inviteRoomId, )
-			} else {
-				const { id } = await firestoreService.addUser({
-					username: this.addRoomUsername
-				})
-				await firestoreService.updateUser(id, { _id: id })
-
-				await firestoreService.addRoom({
-					users: [id, this.currentUserId],
-					lastUpdated: new Date()
-				})
-				// await firestoreService.addRoomUser(this.inviteRoomId, id)
-			}
-			// const { id } = await firestoreService.addUser({
-			// 	username: this.addRoomUsername
-			// })
-			// await firestoreService.updateUser(id, { _id: id })
-
+			} 
+			this.userSelected = []
 			this.addNewRoom = false
 			this.addRoomUsername = ''
 			this.fetchRooms()
 		},
 
 		inviteUser(roomId) {
-			this.resetForms()
+			// this.resetForms()
+			this.addNewRoom = true
 			this.inviteRoomId = roomId
 		},
 
 		async addRoomUser() {
 			this.disableForm = true
 
-			const users = await firestoreService.getUserByName(this.invitedUsername)
-			if (users.data.length !== 0) {
-				await firestoreService.addRoomUser(this.inviteRoomId, users.data[0].id)
-			} else {
-				const { id } = await firestoreService.addUser({
-					username: this.invitedUsername
-				})
-				await firestoreService.updateUser(id, { _id: id })
-
-				await firestoreService.addRoomUser(this.inviteRoomId, id)
-			}
-
+			this.userSelected.forEach(id => {
+				firestoreService.addRoomUser(this.inviteRoomId, id)
+			});
+			this.userSelected = []
 			this.inviteRoomId = null
+			this.addNewRoom = false
 			this.invitedUsername = ''
 			this.fetchRooms()
 		},
@@ -1003,6 +967,7 @@ export default {
 <style lang="scss" scoped>
 .window-container {
 	width: 100%;
+	height: 100vh;
 }
 
 .window-mobile {
