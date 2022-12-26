@@ -7,14 +7,15 @@
                 <div v-if="this.listFollow.length > 0" class="statuses">
                     <div v-for="item in this.listFollow"
                         style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <router-link :to="{ name: 'account', params: { id: item.idFollowers }}">
+                        <router-link :to="{ name: 'account', params: { id: item.idFollowers } }">
                             <div class="status">
                                 <div class="image">
                                     <img :src="item.avatar" alt="img3">
                                 </div>
                             </div>
                         </router-link>
-                        <div style="text-align: center; margin-left: 10px; font-size: 10px;">{{ item.nameFollowers }}</div>
+                        <div style="text-align: center; margin-left: 10px; font-size: 10px;">{{ item.nameFollowers }}
+                        </div>
                     </div>
 
                     <div v-on:click="scroll_left()" class="scrollLeft">
@@ -29,19 +30,21 @@
                 <!-- Code for viewing the Post -->
                 <div v-for="post in posts" class="card">
                     <div class="top">
-                        <div class="userDetails">
-                            <div class="profilepic">
-                                <div class="profile_img">
-                                    <div class="image">
-                                        <img :src="post.avatar" alt="img8">
+                        <router-link :to="{ name: 'account', params: { id: post.idAuthor } }">
+                            <div class="userDetails">
+                                <div class="profilepic">
+                                    <div class="profile_img">
+                                        <div class="image">
+                                            <img :src="post.avatar" alt="img8">
+                                        </div>
                                     </div>
                                 </div>
+                                <h3>{{ post.author }}
+                                    <!-- <br>
+                                    <span>Mumbai, India</span> -->
+                                </h3>
                             </div>
-                            <h3>{{ post.author }}
-                                <!-- <br>
-                                <span>Mumbai, India</span> -->
-                            </h3>
-                        </div>
+                        </router-link>
 
                         <div>
                             <span class="dot">
@@ -149,22 +152,23 @@
             <div class="col-3">
                 <div class="card">
                     <h4>Gợi ý cho bạn</h4>
-                    <div class="top">
-                        <div class="userDetails">
-                            <div class="profilepic">
-                                <div class="profile_img">
-                                    <div class="image">
-                                        <img src="https://media.geeksforgeeks.org/wp-content/uploads/20220609093221/g2-200x200.jpg"
-                                            alt="img12">
+                    <div v-for="item in handleDisplayFolow(listFollowers)" class="top">
+                        <router-link :to="{ name: 'account', params: { id: item.idFollowing } }">
+                            <div class="userDetails">
+                                <div class="profilepic">
+                                    <div class="profile_img">
+                                        <div class="image">
+                                            <img :src="item.avatarFollowing" alt="img12">
+                                        </div>
                                     </div>
                                 </div>
+                                <h3>{{ item.nameFollowing }}<br>
+                                    <span>Đang theo dõi bạn</span>
+                                </h3>
                             </div>
-                            <h3>Aditya Verma<br>
-                                <span>Follows You</span>
-                            </h3>
-                        </div>
+                        </router-link>
                         <div>
-                            <a href="#" class="follow">Theo dõi
+                            <a v-on:click="handleFollow(item)" href="#" class="follow">Theo dõi
                             </a>
                         </div>
                     </div>
@@ -207,6 +211,7 @@ export default ({
         openPost: "",
         openLike: '',
         listFollow: [],
+        listFollowers: [],
         listSearch: [],
         searchText: '',
         message: '',
@@ -219,7 +224,17 @@ export default ({
     },
     mounted() {
 
-        getDataFromStorage(firestoreDb, 'follow').then(res => this.listFollow = res.filter(i => i.idFollowing === JSON.parse(localStorage.getItem('user')).id));
+        getDataFromStorage(firestoreDb, 'follow')
+            .then(res =>
+                // this.listFollow = 
+                res.map(i => {
+                    if (i.idFollowing === JSON.parse(localStorage.getItem('user')).id) {
+                        return this.listFollow.push(i)
+                    } else {
+                        return this.listFollowers.push(i)
+                    }
+                })
+            );
 
         const getAllPost = async () => {
             let data = [];
@@ -349,7 +364,7 @@ export default ({
                 }
 
                 let postObject = null;
-                this.posts.filter(i => {if(i.id === id) i.comments++; return postObject = i; return})
+                this.posts.filter(i => { if (i.id === id) i.comments++; return postObject = i; return })
                 // console.log(postObject)
                 await setDoc(doc(firestoreDb, "posts", id), postObject);
                 handleComment();
@@ -409,7 +424,41 @@ export default ({
         scroll_right() {
             let content = document.querySelector(".statuses");
             content.scrollLeft += 900;
-        }
+        },
+        handleDisplayFolow(arr) {
+            let res = [];
+            this.listFollow.map(
+                a => {
+                    arr.map(b => {
+                        if (a.idFollowing !== b.idFollowers) {
+                            res.push(b)
+                        }
+                    })
+                }
+            )
+            if (res.length > 0) {
+                return res
+            }
+            else return arr;
+        },
+        async handleFollow(item) {
+
+            const obj = {
+                dateFollow: new Date(Date.now()).toUTCString(),
+                avatar: item.avatarFollowing,
+                nameFollowers: item.nameFollowing,
+                idFollowers: item.idFollowing,
+                idFollowing: JSON.parse(localStorage.getItem('user')).id,
+                nameFollowing: JSON.parse(localStorage.getItem('user')).username,
+                avatarFollowing: JSON.parse(localStorage.getItem('user')).avatar,
+            }
+
+            await addDoc(collection(firestoreDb, "follow"), obj)
+
+            this.listFollowers = this.listFollowers.filter(i => { return i.idFollowers !== item.idFollowers })
+            this.listFollow.push(obj);
+        },
+
     }
 })
 </script>

@@ -165,21 +165,29 @@ export default ({
         },
         async handleFollow() {
             // console.log(this.$route.params.id)
+            const obj = {
+                dateFollow: new Date(Date.now()).toUTCString(),
+                avatar: this.info.avatar,
+                nameFollowers: this.info.username,
+                idFollowers: this.$route.params.id,
+                idFollowing: JSON.parse(localStorage.getItem('user')).id,
+                nameFollowing: JSON.parse(localStorage.getItem('user')).username,
+                avatarFollowing: JSON.parse(localStorage.getItem('user')).avatar,
+            }
+
             if (this.isFollow === false) {
-                const docRef = await addDoc(collection(firestoreDb, "follow"), {
-                    dateFollow: new Date(Date.now()).toUTCString(),
-                    avatar: this.info.avatar,
-                    nameFollowers: this.info.username,
-                    idFollowers: this.$route.params.id,
-                    idFollowing: JSON.parse(localStorage.getItem('user')).id,
-                    nameFollowing: JSON.parse(localStorage.getItem('user')).username,
-                    avatarFollowing: JSON.parse(localStorage.getItem('user')).avatar,
-                })
+                const docRef = await addDoc(collection(firestoreDb, "follow"), obj);
+                this.followers.push(obj);
                 return this.isFollow = true;
             }
-            // console.log(this.infoFollow.id)
-            await deleteDoc(doc(firestoreDb, "follow", this.infoFollow.id));
-            return this.isFollow = false;
+            else{
+
+                console.log(this.infoFollow.idFollowing)
+                await deleteDoc(doc(firestoreDb, "follow", this.infoFollow.id));
+                this.followers = this.following.filter( i => {return i.idFollowing !== this.infoFollow.idFollowers})
+                console.log(this.following.length)
+                return this.isFollow = false;
+            }
         },
         handleOpenEdit() {
             this.$router.push({ name: 'edit' })
@@ -210,6 +218,10 @@ body {
 
 img {
     display: block;
+}
+
+main {
+    padding: 0 150px;
 }
 
 .container {
