@@ -271,7 +271,7 @@ export default ({
     },
     methods: {
         async handleLikePost(postId) {
-            const arr = this.likes.filter(i => { return i.idPost.trim().toString() === postId });
+            const arr = this.likes.filter(i => { return i.idPost === postId });
             if (arr.length !== 0) {
                 // Trường hợp unlike
 

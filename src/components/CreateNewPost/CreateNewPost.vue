@@ -60,7 +60,7 @@
 <script>
 
 import { storage, firestoreDb } from '../../database/index';
-import { collection, getDocs, doc, deleteDoc, addDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, addDoc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default ({
@@ -113,11 +113,10 @@ export default ({
                     comments: 0,
                     title: this.caption
                 }
-                const docRef = await addDoc(collection(firestoreDb, "posts"), object)
-
-                const idPost = docRef.id;
+                const newCityRef = doc(collection(firestoreDb, "posts"));
+                await setDoc(newCityRef, object);
+                this.posts.unshift({...object,'id': newCityRef.id.trim().toString()});
                 this.method()
-                this.posts.unshift({...object, idPost});
             }
 
             const storageRef = ref(storage, "images/" + this.fileImage.name);
